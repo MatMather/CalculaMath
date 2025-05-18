@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calculadora com Somatório</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .calculadora {
+      background-color: rgba(34, 34, 34, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px #0005;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 300px;
+      gap: 10px;
+    }
+
+    .tela {
+      width: 100%;
+      height: 50px;
+      font-size: 28px;
+      text-align: center;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      background-color: #333;
+      margin-bottom: 10px;
+    }
+
+    .inputs {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 10px;
+    }
+
+    .inputs input {
+      flex: 1;
+      height: 35px;
+      border-radius: 8px;
+      border: none;
+      padding: 0 10px;
+      font-size: 16px;
+    }
+
+    .formula-input {
+      width: 100%;
+      height: 35px;
+      border-radius: 8px;
+      border: none;
+      padding: 0 10px;
+      font-size: 16px;
+    }
+
+    .botoes {
+      display: grid;
+      grid-template-columns: repeat(4, 60px);
+      gap: 10px;
+    }
+
+    .botoes button {
+      height: 60px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .botoes button:hover {
+      background-color: #666;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="calculadora">
+    <input type="text" class="tela" placeholder="0" disabled />
+
+    <div class="inputs">
+      <input type="number" id="limite-inicial" placeholder="Início (i)" />
+      <input type="number" id="limite-final" placeholder="Fim (n)" />
+    </div>
+
+    <input type="text" id="formula" class="formula-input" placeholder="Fórmula com i, ex: i*i + 2" />
+
+    <div class="botoes">
+      <button>7</button>
+      <button>8</button>
+      <button>9</button>
+      <button>/</button>
+      <button>C</button>
+      <button>4</button>
+      <button>5</button>
+      <button>6</button>
+      <button>*</button>
+      <button>←</button>
+      <button>1</button>
+      <button>2</button>
+      <button>3</button>
+      <button>-</button>
+      <button>∑</button>
+      <button>0</button>
+      <button>.</button>
+      <button>=</button>
+      <button>+</button>
+    </div>
+  </div>
+
+  <script>
+    const tela = document.querySelector('.tela');
+    const botoes = document.querySelectorAll('.botoes button');
+    const limiteInicioInput = document.getElementById('limite-inicial');
+    const limiteFimInput = document.getElementById('limite-final');
+    const formulaInput = document.getElementById('formula');
+
+    let expressao = '';
+
+    botoes.forEach(botao => {
+      botao.addEventListener('click', () => {
+        const valor = botao.textContent;
+
+        if (valor === '=') {
+          try {
+            expressao = eval(expressao);
+            tela.value = expressao;
+          } catch {
+            tela.value = 'Erro';
+            expressao = '';
+          }
+        } else if (valor === 'C') {
+          expressao = '';
+          tela.value = '';
+          limiteInicioInput.value = '';
+          limiteFimInput.value = '';
+          formulaInput.value = '';
+        } else if (valor === '←') {
+          expressao = expressao.slice(0, -1);
+          tela.value = expressao;
+        } else if (valor === '∑') {
+          // Ler limites e fórmula
+          const inicio = Number(limiteInicioInput.value);
+          const fim = Number(limiteFimInput.value);
+          const formula = formulaInput.value;
+
+          if (isNaN(inicio) || isNaN(fim) || inicio > fim) {
+            tela.value = 'Limites inválidos';
+            return;
+          }
+          if (!formula) {
+            tela.value = 'Fórmula vazia';
+            return;
+          }
+
+          let soma = 0;
+          try {
+            for (let i = inicio; i <= fim; i++) {
+              // Avaliar fórmula substituindo "i"
+              // Usamos Function para interpretar a fórmula com "i"
+              const f = new Function('i', `return ${formula}`);
+              soma += f(i);
+            }
+            tela.value = soma;
+            expressao = soma.toString();
+          } catch (e) {
+            tela.value = 'Erro na fórmula';
+          }
+        } else {
+          expressao += valor;
+          tela.value = expressao;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
